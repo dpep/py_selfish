@@ -42,33 +42,33 @@ def selfish(cls, name='self'):
   return cls
 
 
-def _selfish_wrapper(method, name):
-  if name in method.__code__.co_freevars:
+def _selfish_wrapper(function, name):
+  if name in function.__code__.co_freevars:
     # variable is already bound by a closure and
     # can not be changed
     raise ValueError(
       "variable with same name already exists in closure: %s" % name
     )
 
-  @wraps(method)
+  @wraps(function)
   def wrapper(*args, **kwargs):
     # preserve globals
-    key_existed = method.__globals__.has_key(name)
-    old_val = method.__globals__[name] if key_existed else None
+    key_existed = function.__globals__.has_key(name)
+    old_val = function.__globals__[name] if key_existed else None
 
     # update globals with magic self
-    method.__globals__[name] = args[0]
+    function.__globals__[name] = args[0]
 
-    # make method call, omitting the implicit first arg
-    res = method(*args[1:], **kwargs)
+    # make function call, omitting the implicit first arg
+    res = function(*args[1:], **kwargs)
 
     # restore globals
     if key_existed:
-      # unless the value has been changed by the method
-      if method.__globals__[name] == args[0]:
-        method.__globals__[name] = old_val
+      # unless the value has been changed by the function
+      if function.__globals__[name] == args[0]:
+        function.__globals__[name] = old_val
     else:
-      del method.__globals__[name]
+      del function.__globals__[name]
 
     return res
 
