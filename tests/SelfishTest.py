@@ -10,17 +10,8 @@ from selfish import selfish
 
 
 
-class Foo():
-    @selfish
-    def itself(): return self
-
-    @classmethod
-    @selfish
-    def itsclass(): return self
-
-
 @selfish
-class Bar():
+class Foo():
     def itself(): return self
 
     @classmethod
@@ -44,20 +35,13 @@ class SelfishTest(unittest.TestCase):
         self.assertEquals(foo, foo.itself())
         self.assertEquals(Foo, foo.itsclass())
         self.assertEquals(Foo, Foo.itsclass())
-
-
-    def test_class_wrapper(self):
-        bar = Bar()
-        self.assertEquals(bar, bar.itself())
-        self.assertEquals(Bar, bar.itsclass())
-        self.assertEquals(Bar, Bar.itsclass())
-        self.assertEquals(None, bar.static())
-        self.assertEquals(None, Bar.static())
+        self.assertEquals(None, foo.static())
+        self.assertEquals(None, Foo.static())
 
 
     def test_name(fn_self):
+        @selfish(name='this')
         class Foo():
-            @selfish(name='this')
             def this():
                 with fn_self.assertRaises(NameError):
                     # undefined
@@ -113,16 +97,6 @@ class SelfishTest(unittest.TestCase):
         self.assertEquals('itself', Foo.itself.__name__)
 
 
-    def test_double_selfish(fn_self):
-        @selfish
-        class Foo():
-            @selfish
-            def itself(): return self
-
-        foo = Foo()
-        fn_self.assertEquals(foo, foo.itself())
-
-
     def test_globals(fn_self):
         fn_self.assertEquals(123, global_self)
         fn_self.assertNotIn('global_self', locals())
@@ -167,6 +141,16 @@ class SelfishTest(unittest.TestCase):
         # but the global one did
         fn_self.assertEquals(999, globals()['local_self'])
 
+
+    def test_input(self):
+        # can only make classes selfish
+
+        with self.assertRaises(ValueError):
+            def foo(): pass
+            selfish(foo)
+
+        with self.assertRaises(ValueError):
+            selfish(lambda: 123)
 
 
 if __name__ == '__main__':

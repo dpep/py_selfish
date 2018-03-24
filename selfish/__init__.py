@@ -15,70 +15,61 @@ from ambiguous import decorator
 
 
 @decorator
-def selfish(obj, name='self'):
-  if type(obj) == types.FunctionType:
-    method = obj
+def selfish(cls, name='self'):
+  if not isclass(cls):
+    raise ValueError("expected class, found: %s" % cls)
 
-    if getattr(method, '_selfish', False):
-      # already selfish
-      return method
+  # make all instance and class methods selfish
+  for (method_name, method) in getmembers(cls):
+    if type(method) != types.MethodType:
+      # not a class method
+      continue
 
-    if name in method.__code__.co_freevars:
-      # variable is already bound by a closure and
-      # can not be changed
-      raise ValueError(
-        "variable with same name already exists in closure: %s" % name
-      )
+    if cls != (method.im_self or method.im_class):
+      # skip inherited methods
+      continue
 
-    @wraps(method)
-    def wrapper(*args, **kwargs):
-      # preserve globals
-      key_existed = method.__globals__.has_key(name)
-      old_val = method.__globals__[name] if key_existed else None
+    # instance method
+    wrapper = _selfish_wrapper(method.im_func, name)
 
-      # update globals with magic self
-      method.__globals__[name] = args[0]
+    if method.im_self:
+      # class method
+      wrapper = classmethod(wrapper)
 
-      # make method call, omitting the implicit first arg
-      res = method(*args[1:], **kwargs)
+    # bind new selfish method to class
+    setattr(cls, method.__name__, wrapper)
 
-      # restore globals
-      if key_existed:
-        # unless the value has been changed by the method
-        if method.__globals__[name] == args[0]:
-          method.__globals__[name] = old_val
-      else:
-        del method.__globals__[name]
+  return cls
 
-      return res
 
-    # annotate method as selfish
-    setattr(wrapper, '_selfish', name)
-    return wrapper
+def _selfish_wrapper(method, name):
+  if name in method.__code__.co_freevars:
+    # variable is already bound by a closure and
+    # can not be changed
+    raise ValueError(
+      "variable with same name already exists in closure: %s" % name
+    )
 
-  elif isclass(obj):
-    # make all class instance methods selfish
-    cls = obj
+  @wraps(method)
+  def wrapper(*args, **kwargs):
+    # preserve globals
+    key_existed = method.__globals__.has_key(name)
+    old_val = method.__globals__[name] if key_existed else None
 
-    for (method_name, method) in getmembers(cls):
-      if type(method) != types.MethodType:
-        # not a class method
-        continue
+    # update globals with magic self
+    method.__globals__[name] = args[0]
 
-      if cls != (method.im_self or method.im_class):
-        # skip inherited methods
-        continue
+    # make method call, omitting the implicit first arg
+    res = method(*args[1:], **kwargs)
 
-      wrapper = selfish(method.im_func, name)
+    # restore globals
+    if key_existed:
+      # unless the value has been changed by the method
+      if method.__globals__[name] == args[0]:
+        method.__globals__[name] = old_val
+    else:
+      del method.__globals__[name]
 
-      if method.im_self:
-        # class method
-        wrapper = classmethod(selfish(method.im_func, name))
+    return res
 
-      # bind new selfish method to class
-      setattr(cls, method.__name__, wrapper)
-
-    return obj
-
-  else:
-    raise ValueError("type not supported: %s" % obj)
+  return wrapper
