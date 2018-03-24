@@ -5,7 +5,7 @@ __version__ = '0.1.0'
 __all__ = [ 'selfish' ]
 
 
-import types
+from types import MethodType
 
 from functools import wraps
 from inspect import getmembers, isclass
@@ -21,7 +21,7 @@ def selfish(cls, name='self'):
 
   # make all instance and class methods selfish
   for (method_name, method) in getmembers(cls):
-    if type(method) != types.MethodType:
+    if type(method) != MethodType:
       # not a class method
       continue
 
