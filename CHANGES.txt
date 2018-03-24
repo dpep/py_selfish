@@ -1,3 +1,6 @@
+v0.2.0, 2018-03-24
+    3a36113 rename to be more accurate
+    26acc51 only classes can be made selfish
 v0.1.0, 2018-03-23
     
 
