@@ -77,7 +77,7 @@ class SelfishTest(unittest.TestCase):
 
 
     def test_closure(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(NameError):
             @selfish
             class Nope():
                 # 'self' already bound from test_closure()

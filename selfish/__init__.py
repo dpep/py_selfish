@@ -46,7 +46,7 @@ def _selfish_wrapper(function, name):
   if name in function.__code__.co_freevars:
     # variable is already bound by a closure and
     # can not be changed
-    raise ValueError(
+    raise NameError(
       "variable with same name already exists in closure: %s" % name
     )
 
