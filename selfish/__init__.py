@@ -17,7 +17,7 @@ from ambiguous import decorator
 @decorator
 def selfish(cls, name='self'):
   if not isclass(cls):
-    raise ValueError("expected class, found: %s" % cls)
+    raise ValueError('expected class, found: %s' % cls)
 
   # make all instance and class methods selfish
   for (method_name, method) in getmembers(cls):
@@ -25,7 +25,9 @@ def selfish(cls, name='self'):
       # not a class method
       continue
 
-    if cls != (method.im_self or method.im_class):
+    # for instance methods, im_class == cls
+    # for class methods, im_self == cls
+    if cls != method.im_self and cls != method.im_class:
       # skip inherited methods
       continue
 
