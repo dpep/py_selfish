@@ -8,7 +8,7 @@ Making 'self' implicit, because even Java did a better job at this.
 
 
 ### Usage
-```
+```python
 @selfish
 class Foo():
     def __init__(val): self.val = val
