@@ -20,6 +20,7 @@ class Foo():
     @staticmethod
     def static(): return globals().get('self')
 
+# test with args
 
 # for test_globals()
 global_self = 123
@@ -32,17 +33,17 @@ class SelfishTest(unittest.TestCase):
 
     def test_basics(self):
         foo = Foo()
-        self.assertEquals(foo, foo.itself())
-        self.assertEquals(Foo, foo.itsclass())
-        self.assertEquals(Foo, Foo.itsclass())
-        self.assertEquals(None, foo.static())
-        self.assertEquals(None, Foo.static())
+        self.assertEqual(foo, foo.itself())
+        self.assertEqual(Foo, foo.itsclass())
+        self.assertEqual(Foo, Foo.itsclass())
+        self.assertEqual(None, foo.static())
+        self.assertEqual(None, Foo.static())
 
 
     def test_name(fn_self):
         @selfish(name='this')
         class Foo():
-            def this():
+            def itself():
                 with fn_self.assertRaises(NameError):
                     # undefined
                     self
@@ -50,7 +51,7 @@ class SelfishTest(unittest.TestCase):
                 return this
 
         foo = Foo()
-        fn_self.assertEquals(foo, foo.this())
+        fn_self.assertEqual(foo, foo.itself())
 
 
     def test_instance_var(fn_self):
@@ -59,7 +60,7 @@ class SelfishTest(unittest.TestCase):
             def __init__(val): self.val = val
             def get(): return self.val
 
-        fn_self.assertEquals(123, Foo(123).get())
+        fn_self.assertEqual(123, Foo(123).get())
 
 
     def test_class_inheritence(fn_self):
@@ -69,11 +70,11 @@ class SelfishTest(unittest.TestCase):
                 return [ x * 2 for x in self.values() ]
 
         # inherited methods are unaffected
-        fn_self.assertEquals(1, len(Foo({ 'a' : 1 })))
-        fn_self.assertEquals([ 1 ], Foo({ 'a' : 1 }).values())
+        fn_self.assertEqual(1, len(Foo({ 'a' : 1 })))
+        fn_self.assertEqual([ 1 ], list(Foo({ 'a' : 1 }).values()))
 
         # new methods are selfish
-        fn_self.assertEquals([ 2 ], Foo({ 'a' : 1 }).double())
+        fn_self.assertEqual([ 2 ], Foo({ 'a' : 1 }).double())
 
 
     def test_closure(self):
@@ -88,17 +89,17 @@ class SelfishTest(unittest.TestCase):
         # ensure selfish methods are wrapped up properly
 
         self.assertTrue(inspect.isclass(Foo))
-        self.assertEquals('Foo', Foo.__name__)
+        self.assertEqual('Foo', Foo.__name__)
 
-        self.assertEquals(
-            '<unbound method Foo.itself>',
+        self.assertIn(
+            'function Foo.itself',
             str(Foo.itself)
         )
-        self.assertEquals('itself', Foo.itself.__name__)
+        self.assertEqual('itself', Foo.itself.__name__)
 
 
     def test_globals(fn_self):
-        fn_self.assertEquals(123, global_self)
+        fn_self.assertEqual(123, global_self)
         fn_self.assertNotIn('global_self', locals())
 
         @selfish(name='global_self')
@@ -109,7 +110,7 @@ class SelfishTest(unittest.TestCase):
         Change().do(789)
 
         # change to globals should persist
-        fn_self.assertEquals(789, global_self)
+        fn_self.assertEqual(789, global_self)
 
 
     def test_locals(fn_self):
@@ -117,7 +118,7 @@ class SelfishTest(unittest.TestCase):
 
         fn_self.assertIn('local_self', locals())
         fn_self.assertIn('local_self', globals())
-        fn_self.assertNotEquals(
+        fn_self.assertNotEqual(
             locals()['local_self'],
             globals()['local_self']
         )
@@ -136,10 +137,10 @@ class SelfishTest(unittest.TestCase):
         Change().do(999)
 
         # local value should not have changed
-        fn_self.assertEquals(111, local_self)
+        fn_self.assertEqual(111, local_self)
 
         # but the global one did
-        fn_self.assertEquals(999, globals()['local_self'])
+        fn_self.assertEqual(999, globals()['local_self'])
 
 
     def test_input(self):
