@@ -50,8 +50,9 @@ if __name__ == "__main__":
         url = "https://github.com/dpep/py_%s" % PACKAGE,
         license = "MIT",
         author = "Daniel Pepper",
-        description = "python dark magic",
+        description = "implicit self",
         long_description = open('README.md').read(),
+        long_description_content_type='text/markdown',
         platforms = "any",
 
         packages = [ PACKAGE ],
