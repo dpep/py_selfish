@@ -1,6 +1,10 @@
+v0.3.0, 2020-02-03
+    c4ff400 more testing
+    5d6e654 upgrading to python3 and dropping support for python2
+    7cad191 add more comments because these python internals are confusing
 v0.2.0, 2018-03-24
     3a36113 rename to be more accurate
     26acc51 only classes can be made selfish
 v0.1.0, 2018-03-23
-    
+
 
