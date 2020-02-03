@@ -63,6 +63,24 @@ class SelfishTest(unittest.TestCase):
         fn_self.assertEqual(123, Foo(123).get())
 
 
+    def test_args(fn_self):
+        @selfish
+        class Foo():
+            def itself(arg): return arg
+
+            @classmethod
+            def itsclass(arg): return arg
+
+            @staticmethod
+            def static(arg): return arg
+
+        fn_self.assertEqual(123, Foo().itself(123))
+        fn_self.assertEqual(123, Foo().itsclass(123))
+        fn_self.assertEqual(123, Foo.itsclass(123))
+        fn_self.assertEqual(123, Foo().static(123))
+        fn_self.assertEqual(123, Foo.static(123))
+
+
     def test_class_inheritence(fn_self):
         @selfish
         class Foo(dict):
