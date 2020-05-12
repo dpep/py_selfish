@@ -25,3 +25,6 @@ Foo(1).val()
 Foo.klass()
 > Foo
 ```
+
+----
+[![installs](https://img.shields.io/pypi/dm/selfish.svg?label=installs)](https://pypi.org/project/selfish)
