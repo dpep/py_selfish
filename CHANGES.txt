@@ -1,3 +1,5 @@
+0.3.1, 2024-07-31
+    upgrades
 v0.3.0, 2020-02-03
     c4ff400 more testing
     5d6e654 upgrading to python3 and dropping support for python2
