@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools >= 61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "selfish"
+authors = [{name = "Daniel Pepper"}]
+dynamic = ["version"]
+description = "implicit self"
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+classifiers = [
+  # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Utilities",
+]
+requires-python = ">= 3"
+keywords = ["simplify"]
+dependencies = ["ambiguous"]
+
+[project.optional-dependencies]
+test = [
+  "isort >= 5.13",
+  "pytest >= 8.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/dpep/selfish_py"
+
+[tool.setuptools.dynamic]
+version = {attr = "selfish.__version__"}

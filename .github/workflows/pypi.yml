@@ -1,0 +1,46 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags: '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Python setup
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+    - name: install pypa/build
+      run: python3 -m pip install build --user
+    - name: build wheel and source tarball
+      run: python3 -m build
+    - name: store distribution packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/')  # only on tag pushes
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/selfish
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+
+    steps:
+      - name: download dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: publish
+        uses: pypa/gh-action-pypi-publish@release/v1

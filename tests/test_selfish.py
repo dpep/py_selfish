@@ -9,7 +9,6 @@ sys.path = [ os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) ] + 
 from selfish import selfish
 
 
-
 @selfish
 class Foo():
     def itself(): return self

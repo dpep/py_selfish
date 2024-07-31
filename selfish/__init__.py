@@ -5,13 +5,11 @@ __version__ = '0.3.0'
 __all__ = [ 'selfish' ]
 
 
-from types import MethodType, FunctionType
-
 from functools import wraps
 from inspect import getmembers, isclass
+from types import FunctionType, MethodType
 
 from ambiguous import decorator
-
 
 
 @decorator
