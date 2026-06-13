@@ -160,6 +160,18 @@ class SelfishTest(unittest.TestCase):
         fn_self.assertEqual(999, globals()['local_self'])
 
 
+    def test_exception_restores_globals(fn_self):
+        @selfish
+        class Boom():
+            def go(): raise ValueError
+
+        # a raising method should not leak 'self' into the module globals
+        with fn_self.assertRaises(ValueError):
+            Boom().go()
+
+        fn_self.assertNotIn('self', globals())
+
+
     def test_input(self):
         # can only make classes selfish
 

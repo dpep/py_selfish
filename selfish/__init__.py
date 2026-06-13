@@ -64,18 +64,18 @@ def create_wrapper(fn, name):
         # update function namespace to include magic 'self'
         fn.__globals__[name] = self
 
-        # make function call, omitting the implicit first arg
-        res = fn(*args, **kwargs)
-
-        # restore globals
-        if key_existed:
-            # unless the value has been changed by the function
-            if fn.__globals__[name] == self:
-                fn.__globals__[name] = old_val
-        else:
-            del fn.__globals__[name]
-
-        return res
+        try:
+            # make function call, omitting the implicit first arg
+            return fn(*args, **kwargs)
+        finally:
+            # restore globals
+            if key_existed:
+                # unless the value has been changed by the function
+                if fn.__globals__[name] is self:
+                    fn.__globals__[name] = old_val
+            elif fn.__globals__[name] is self:
+                # unless the function bound a new global with this name
+                del fn.__globals__[name]
 
     return wrapper
 
