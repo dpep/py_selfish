@@ -9,6 +9,27 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.12', '3.13', '3.14' ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Python setup
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: pip
+    - name: install dependencies
+      run: pip install -e .[test]
+    - run: pytest
+
+
+  # build and publish on tags
+  publish:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/')  # tags pushed
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -17,22 +38,12 @@ jobs:
       with:
         python-version: 3.x
         cache: pip
-    - name: install dependencies
-      run: pip install -e .[test]
-    - run: pytest
-
-
-    # build and publish
     - name: build package
-      if: startsWith(github.ref, 'refs/tags/')  # tags pushed
       run: |
         pip install build
         python -m build  # build wheel and source tarball
     - name: publish
-      if: startsWith(github.ref, 'refs/tags/')  # tags pushed
       uses: pypa/gh-action-pypi-publish@release/v1
-      env:
-        url: https://pypi.org/p/selfish
 
 
 permissions:
