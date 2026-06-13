@@ -13,13 +13,13 @@ Making 'self' implicit, because even Java did a better job at this.
 class Foo():
     def __init__(val): self.val = val
 
-    def val(): return self.val
+    def get(): return self.val
 
     @classmethod
     def klass(): return self
 
 
-Foo(1).val()
+Foo(1).get()
 > 1
 
 Foo.klass()
